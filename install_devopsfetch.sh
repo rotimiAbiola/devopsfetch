@@ -24,15 +24,27 @@ detect_os() {
 # Function to install dependencies for Debian-based systems
 install_debian_dependencies() {
   sudo apt update || log_error "Failed to update package list"
-  sudo apt install -y net-tools docker.io nginx || log_error "Failed to install dependencies"
-	sudo usermod -aG docker $USER || log_error "User already added to Sudoers"
+  for pkg in net-tools docker.io nginx; do
+    if ! dpkg -l | grep -q "^ii  $pkg "; then
+      sudo apt install -y $pkg || log_error "Failed to install $pkg"
+    else
+      echo "$pkg is already installed"
+    fi
+  done
+  sudo usermod -aG docker $USER || log_error "Failed to add user to docker group"
 }
 
 # Function to install dependencies for RHEL-based systems
 install_rhel_dependencies() {
   sudo yum update -y || log_error "Failed to update package list"
-  sudo yum install -y net-tools docker nginx || log_error "Failed to install dependencies"
-	sudo usermod -aG docker $USER || log_error "User already added to Sudoers"
+  for pkg in net-tools docker nginx; do
+    if ! rpm -q $pkg; then
+      sudo yum install -y $pkg || log_error "Failed to install $pkg"
+    else
+      echo "$pkg is already installed"
+    fi
+  done
+  sudo usermod -aG docker $USER || log_error "Failed to add user to docker group"
 }
 
 # Install necessary dependencies based on the detected OS
@@ -51,25 +63,25 @@ case "$OS" in
 esac
 
 # Copy devopsfetch script to /usr/local/bin
-sudo cp devopsfetch.sh /usr/local/bin/devopsfetch || log_error "Failed to copy devopsfetch to /usr/local/bin/"
+sudo cp ./devopsfetch.sh /usr/local/bin/devopsfetch || log_error "Failed to copy devopsfetch to /usr/local/bin/"
 sudo chmod +x /usr/local/bin/devopsfetch || log_error "Failed to make devopsfetch executable"
 
 # Create systemd service file
-sudo cp devopsfetch.service /etc/systemd/system/
+sudo cp ./devopsfetch.service /etc/systemd/system/
 
 # Enable and start the systemd service
 sudo systemctl enable devopsfetch.service || log_error "Failed to enable devopsfetch.service"
 sudo systemctl start devopsfetch.service || log_error "Failed to start devopsfetch.service"
 
 # Set up log rotation
-sudo tee /etc/logrotate.d/devopsfetch << EOF
+sudo tee /etc/logrotate.d/devopsfetch > /dev/null <<EOF
 /var/log/devopsfetch_output.log /var/log/devopsfetch_error.log {
     daily
     rotate 7
     compress
     missingok
     notifempty
-    create 0640 root adm
+    create 0640 root root
     sharedscripts
     postrotate
         systemctl reload devopsfetch.service > /dev/null 2>/dev/null || true

@@ -235,6 +235,30 @@ display_activities_in_time_range() {
     journalctl --since="$start_date" --until="$end_date"
 }
 
+continuous_monitoring() {
+    log_file="/var/log/devopsfetch.log"
+    while true; do
+        echo "Monitoring activities at $(date)" >> "$log_file"
+        echo "Ports:" >> "$log_file"
+        display_ports >> "$log_file"
+        echo "Users:" >> "$log_file"
+        list_users >> "$log_file"
+        echo "Docker Info:" >> "$log_file"
+        list_docker_info >> "$log_file"
+        echo "Nginx Domains:" >> "$log_file"
+        list_nginx_domains >> "$log_file"
+        echo "-------------------------------------------------------------------" >> "$log_file"
+        sleep 60  # Run every minute
+    done
+}
+
+# Handle continuous monitoring mode
+if [ "$1" == "--monitor" ]; then
+    continuous_monitoring
+    exit 0
+fi
+
+
 case $1 in
     -p|--port)
         if [ -z "$2" ]; then

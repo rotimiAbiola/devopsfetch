@@ -4,8 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/devopsfetch
-Restart=on-failure
+ExecStart=/usr/local/bin/devopsfetch --monitor
+Restart=always
+User=root
 StandardOutput=append:/var/log/devopsfetch.log
 StandardError=append:/var/log/devopsfetch.log
 
