@@ -10,14 +10,16 @@ A tool for devops that collects and displays system information, including activ
 
 2. Usage Examples:
 
-- Display active ports: devopsfetch.sh -p
-- Display Docker containers: devopsfetch.sh -d
-- Display Nginx domains: devopsfetch.sh -n
-- Display users and their last login times: devopsfetch.sh -u
+- Display active ports: devopsfetch -p
+- Display Docker containers: devopsfetch -d
+- Display Nginx domains: devopsfetch -n
+- Display users and their last login times: devopsfetch -u
 
 3. Logging Mechanism:
 
-- Logs are stored in /var/log/devopsfetch/devopsfetch.log.
+- The devopsfetch log will be stored in two files:
+    - Output Log: /var/log/devopsfetch_output.log
+    - Error Log: /var/log/devopsfetch_error.log
 - Log rotation is handled by the logrotate configuration set up during installation.
 
 This script covers the installation of necessary dependencies, setting up a systemd service for continuous monitoring, and providing help and documentation. Adjust the monitoring interval and commands as needed for your specific use case.
