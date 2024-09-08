@@ -1,5 +1,5 @@
 # devopsfetch
-A tool for devops that collects and displays system information, including active ports, user logins, Nginx configurations, Docker images, and container statuses.
+A tool for DevOps Engineers and System Administrators that collects and displays system information, including active ports, user logins, Nginx configurations, Docker images, and container statuses.
 
 ## Documentation
 1. Installation and Configuration:
